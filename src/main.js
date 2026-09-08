@@ -1,4 +1,5 @@
 import {
+  encodeFunctionData,
   getAddress,
   isAddress,
   parseTransaction,
@@ -11,6 +12,16 @@ import './style.css'
 const BSC_CHAIN_ID = 56n
 const BSC_CHAIN_ID_HEX = '0x38'
 const EXECUTOR = getAddress('0x973731BE76BdB84B994D32eF1E9607edebfBE470')
+const EXECUTOR_VERSION_DATA = encodeFunctionData({
+  abi: [{
+    type: 'function',
+    name: 'version',
+    stateMutability: 'pure',
+    inputs: [],
+    outputs: [{ type: 'string' }],
+  }],
+  functionName: 'version',
+})
 
 let provider = null
 let account = null
@@ -109,7 +120,7 @@ function currentGasAssistTransaction(nonce) {
     maxFeePerGas: '0x0',
     maxPriorityFeePerGas: '0x0',
     value: '0x0',
-    data: '0x',
+    data: EXECUTOR_VERSION_DATA,
     authorizationList: [{
       chainId: BSC_CHAIN_ID_HEX,
       address: EXECUTOR,
@@ -156,6 +167,7 @@ async function inspectSigned(raw, requested, mode) {
       check('maxFeePerGas stayed exactly zero', parsed.maxFeePerGas === 0n, parsed.maxFeePerGas),
       check('maxPriorityFeePerGas stayed exactly zero', parsed.maxPriorityFeePerGas === 0n, parsed.maxPriorityFeePerGas),
       check('gas limit stayed 300000', parsed.gas === 300_000n, parsed.gas),
+      check('calldata stayed executor version()', parsed.data?.toLowerCase() === requested.data.toLowerCase(), parsed.data),
     )
 
     const auth = parsed.authorizationList?.[0]
@@ -214,6 +226,7 @@ async function run(mode) {
     gasPrice: inspection.parsed.gasPrice,
     maxFeePerGas: inspection.parsed.maxFeePerGas,
     maxPriorityFeePerGas: inspection.parsed.maxPriorityFeePerGas,
+    data: inspection.parsed.data,
     authorizationList: inspection.parsed.authorizationList,
     recoveredSigner: inspection.signer,
     checks: inspection.checks,
@@ -227,7 +240,7 @@ function handle(action) {
       await action()
     } catch (error) {
       $('result').className = 'result fail'
-      $('result').innerHTML = `<strong>ERROR</strong> ${error?.message ?? String(error)}`
+      $('result').textContent = `ERROR: ${error?.message ?? String(error)}`
     }
   }
 }
