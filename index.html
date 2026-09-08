@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nightly Gas Assist Test</title>
+</head>
+<body>
+  <main class="wrap">
+    <h1>Nightly Gas Assist compatibility test</h1>
+    <p class="lead">Signs only. Nothing is broadcast automatically.</p>
+
+    <section class="card">
+      <div class="row"><strong>Nightly</strong><span id="wallet-status">Not connected</span></div>
+      <div class="row"><span>Account</span><code id="account">-</code></div>
+      <div class="row"><span>Chain</span><code id="chain">-</code></div>
+      <button id="connect">Connect Nightly</button>
+    </section>
+
+    <section class="card">
+      <h2>1. Nightly documented zero-gas raw signing</h2>
+      <p>Uses <code>eth_signTransaction</code> with <code>gasPrice: 0</code>. This isolates whether Nightly preserves zero gas and returns raw signed bytes.</p>
+      <button id="test-legacy" disabled>Sign zero-gas test</button>
+    </section>
+
+    <section class="card">
+      <h2>2. Current Pistachio Gas Assist EIP-7702 shape</h2>
+      <p>Uses type <code>0x4</code>, BNB Chain, zero max fees, your current atomic executor, and authorization nonce = transaction nonce + 1.</p>
+      <button id="test-7702" disabled>Sign current Gas Assist shape</button>
+    </section>
+
+    <section class="card">
+      <h2>Result</h2>
+      <div id="result" class="result muted">Run a test.</div>
+      <details>
+        <summary>Requested transaction</summary>
+        <pre id="requested">-</pre>
+      </details>
+      <details>
+        <summary>Parsed signed transaction</summary>
+        <pre id="parsed">-</pre>
+      </details>
+      <details>
+        <summary>Raw signed transaction</summary>
+        <p class="warning">Treat this raw transaction as broadcastable data. Do not paste it into random sites.</p>
+        <pre id="raw">-</pre>
+      </details>
+    </section>
+  </main>
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
