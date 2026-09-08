@@ -151,7 +151,7 @@ async function inspectSigned(raw, requested, mode) {
   const checks = [
     check('transaction signer is connected account', sameAddress(signer, account), signer),
     check('recipient stayed the connected account', sameAddress(parsed.to, account), parsed.to),
-    check('nonce was not changed', parsed.nonce === requestedNonce, parsed.nonce),
+    check('nonce was not changed', BigInt(parsed.nonce ?? -1) === requestedNonce, parsed.nonce),
     check('value stayed zero', parsed.value === 0n, parsed.value),
   ]
 
